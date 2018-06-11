@@ -47,7 +47,7 @@ void xuatKetQua()
     {
         while (u != v)
         {
-            cout << v << " ";
+            cout << v << "<-";
             v = Trace[v];
 
         }
