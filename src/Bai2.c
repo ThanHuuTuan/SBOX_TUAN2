@@ -15,7 +15,6 @@ int main()
     char matrix[50][50];
     int chon=0,count=0;
     int wCount;
-    int line, col,i;
 
     printf("Enter file name: ");
     scanf("%s", path);
@@ -27,7 +26,7 @@ if (fPtr == NULL || fTemp == NULL)
         /* Unable to open file hence exit */
         printf("\nUnable to open.\n");
         printf("Please check your file.\n");
-        exit(EXIT_SUCCESS);
+        exit(EXIT_FAILURE);
     }
 else{
    do
@@ -43,35 +42,22 @@ else{
         switch(chon)
         {
             case 1:
-                    {
-                    printf("Input a word: ");
-                    scanf("%s", newWord);
-// COunt occurrences
-                     wCount = countOccurrences(fPtr, newWord);
-                     printf("'%s' appears %d times in File.\n", newWord, wCount);
-
-/* Display index of substring
-                    indexOf(fPtr, newWord, &line, &col);
-                    if (line!= -1){
-                        printf("line: %d, col: %d\n", line+1, col + 1);
-                    }
-                     else{
-                        printf("------------------NO EXIST-------\n");
-                     }
-*/
+                {
+                    printf("Substring to search:");
+                    scanf("%s",newWord);
+                    Postion(fPtr,newWord);
+// Count occurrences
+                    countOccurrences(fPtr, newWord);
                     fclose(fPtr);
-
                     break;
 
                     }
 
             case 2:{
-                printf("Enter word want to replace: ");
+                printf("Enter substring want to replace: ");
                 scanf("%s", oldWord);
-
                 printf("Replace '%s' by: ");
                 scanf("%s", newWord);
-
                 while ((fgets(buffer, BUFFER_SIZE, fPtr)) != NULL)
                     {
                         // Replace all occurrence of word from current line
@@ -99,6 +85,7 @@ else{
 
     }while(chon!=4);
     return 0;
+
     }
 }
 void replaceAll(char *str, const char *oldWord, const char *newWord)
@@ -124,18 +111,8 @@ void replaceAll(char *str, const char *oldWord, const char *newWord)
         strcat(str, temp + index + owlen);
     }
 }
-int match(const char *s, const char *p, int overlap)
-{
-        int c = 0, l = strlen(p);
 
-        while (*s != '\0') {
-                if (strncmp(s++, p, l)) continue;
-                if (!overlap) s += l - 1;
-                c++;
-        }
-        return c;
-}
-int countOccurrences(FILE *fptr, const char *word)
+void countOccurrences(FILE *fptr, const char *word)
 {
     char str[BUFFER_SIZE];
     char *pos;
@@ -155,35 +132,45 @@ int countOccurrences(FILE *fptr, const char *word)
             count++;
 
         }
+
     }
-    return count;
+    printf("-->'%s' appears %d times in File.\n", word, count);
+   //return count;
 }
-int indexOf(FILE *fptr, const char *word, int *line, int *col)
+
+void Postion(FILE *fp, const char *subStr)
 {
-    char str[BUFFER_SIZE];
-    char *pos;
-    *line = -1;
-    *col  = -1;
-
-    while ((fgets(str, BUFFER_SIZE, fptr)) != NULL)
+    char line[MAX_SIZE];
+    int line_number=0,l=0,i,j,flag;
+    char c;
+    do
     {
-        *line += 1;
-        // Find first occurrence of word in str
-        pos = strstr(str, word);
-        if (pos != NULL)
+        //read by line
+        l=0;
+        memset(line,'\0',sizeof(line));
+        while((c = fgetc(fp)) != EOF)
         {
-            // First index of word in str is
-            // Memory address of pos - memory
-            // address of str.
-                    *col = (pos - str);
-                     col++;
-            break;
+            if(c=='\n')
+                break;
+            line[l++]=(char)c;
         }
-    }
-    // If word is not found then set line to -1
-    if (*col == -1)
-        *line = -1;
-    return *col;
+        line[l]='\0';
+        for(i=0;i<strlen(line)-strlen(subStr);i++)
+        {
+            flag=1;
+            for(j=0;j<strlen(subStr);j++)
+            {
+                if(line[i+j]!=subStr[j])
+                {
+                    flag=0;
+                    break;
+                }
+            }
+            if(flag==1)
+                printf("=>line: %d, column: %d \n",line_number,i);
+        }
+        line_number++;
+    }while(c!=EOF);
+
 
 }
-
